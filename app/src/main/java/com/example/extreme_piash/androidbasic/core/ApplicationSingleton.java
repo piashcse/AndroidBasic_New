@@ -188,7 +188,7 @@ public class ApplicationSingleton extends MultiDexApplication {
     }
 
     public NetworkCallInterface getNetworkCallInterface(){
-        Retrofit retrofit = ApiClient.getInstance(this);
+        Retrofit retrofit = ApiClient.getInstance(ApplicationSingleton.this);
         networkCallInterface = retrofit.create(NetworkCallInterface.class);
 
         return networkCallInterface;
