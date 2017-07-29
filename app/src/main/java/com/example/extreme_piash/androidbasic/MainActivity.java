@@ -6,6 +6,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.extreme_piash.androidbasic.Model.BaseModel;
@@ -29,6 +31,10 @@ public class MainActivity extends BaseActivity {
     private static final String TAG= "MainActivity";
     @BindView(R.id.recyclerveiw)
     RecyclerView recyclerView;
+    @BindView(R.id.progressbar)
+    ProgressBar progressBar;
+    @BindView(R.id.textViewDataNotFound)
+    TextView textViewNodataFound;
     private LinearLayoutManager layoutManager;
     private RVAdapter rvAdapter;
     private NetworkCallInterface networkCallInterface;
@@ -43,18 +49,37 @@ public class MainActivity extends BaseActivity {
         recyclerView.setLayoutManager(layoutManager);
         rvAdapter = new RVAdapter(getApplicationContext());
 
+        initApi();
+    }
+
+    public void initApi(){
+
+        if (progressBar != null){
+            progressBar.setVisibility(View.VISIBLE);
+        }
         ApplicationSingleton.getInstance().getNetworkCallInterface().getApiData().enqueue(new Callback<BaseModel>() {
             @Override
             public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
 
-                rvAdapter.setData(response.body().getCategories());
-                recyclerView.setAdapter(rvAdapter);
-                rvAdapter.setOnclickListener(new RClickListener() {
-                    @Override
-                    public void onItemClick(int position, View view) {
+                if (response.body() != null){
 
+                    if (progressBar != null){
+                        progressBar.setVisibility(View.GONE);
                     }
-                });
+                    rvAdapter.setData(response.body().getCategories());
+                    recyclerView.setAdapter(rvAdapter);
+                    rvAdapter.setOnclickListener(new RClickListener() {
+                        @Override
+                        public void onItemClick(int position, View view) {
+
+                        }
+                    });
+
+                    if (response.body().getCategories().size() <= 0){
+                        textViewNodataFound.setVisibility(View.VISIBLE);
+                    }
+                }
+
             }
 
             @Override
